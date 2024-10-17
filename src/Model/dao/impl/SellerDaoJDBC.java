@@ -1,7 +1,7 @@
-package dao;
+package Model.dao.impl;
 
 import Model.entities.Seller;
-import Interfaces.SellerDAO;
+import Model.dao.SellerDAO;
 
 import java.util.List;
 

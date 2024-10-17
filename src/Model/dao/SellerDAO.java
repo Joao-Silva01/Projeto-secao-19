@@ -1,4 +1,4 @@
-package Interfaces;
+package Model.dao;
 
 import Model.entities.Seller;
 

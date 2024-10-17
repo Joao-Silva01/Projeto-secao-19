@@ -1,7 +1,7 @@
-package dao;
+package Model.dao.impl;
 
 import Model.entities.Department;
-import Interfaces.DepartmentDAO;
+import Model.dao.DepartmentDAO;
 
 import java.util.List;
 
