@@ -22,6 +22,11 @@ public class DepartmentDaoJDBC implements DepartmentDAO {
     }
 
     @Override
+    public void findById(Integer id) {
+
+    }
+
+    @Override
     public List<Department> findAll() {
         return List.of();
     }
