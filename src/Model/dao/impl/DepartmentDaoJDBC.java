@@ -3,9 +3,20 @@ package Model.dao.impl;
 import Model.entities.Department;
 import Model.dao.DepartmentDAO;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class DepartmentDaoJDBC implements DepartmentDAO {
+
+    private Connection conn;
+
+    public DepartmentDaoJDBC(Connection conn){
+        this.conn = conn;
+    }
+
     @Override
     public void insert(Department obj) {
 
@@ -22,9 +33,10 @@ public class DepartmentDaoJDBC implements DepartmentDAO {
     }
 
     @Override
-    public void findById(Integer id) {
-
+    public Department findById(Integer id) {
+        return null;
     }
+
 
     @Override
     public List<Department> findAll() {
