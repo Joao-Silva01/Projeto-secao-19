@@ -4,11 +4,11 @@ import Model.entities.Department;
 import Model.entities.Seller;
 import Model.dao.SellerDAO;
 import db.DB;
+import db.DbException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +17,8 @@ import java.util.Map;
 public class SellerDaoJDBC implements SellerDAO {
 
     private Connection conn;
+    private SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+
 
     public SellerDaoJDBC(Connection conn){
         this.conn = conn;
@@ -24,7 +26,39 @@ public class SellerDaoJDBC implements SellerDAO {
 
     @Override
     public void insert(Seller obj) {
+        PreparedStatement ps = null;
+        try{
+            ps = conn.prepareStatement(
+                    "INSERT INTO seller "
+                            +"(Name,Email,BirthDate,BaseSalary, DepartmentId) "
+                            +"VALUES "
+                            +"(?,?,?,?,?)",
+                    Statement.RETURN_GENERATED_KEYS);
 
+            ps.setString(1,obj.getName());
+            ps.setString(2,obj.getEmail());
+            ps.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+            ps.setDouble(4,obj.getBaseSalary());
+            ps.setInt(5,obj.getDepartment().getId());
+
+            int rowsAffect = ps.executeUpdate();
+
+            if(rowsAffect > 0){
+                ResultSet rs = ps.getGeneratedKeys();
+                if(rs.next()){
+                    int id = rs.getInt(1);
+                    obj.setId(id);
+                }
+                DB.closeResultSet(rs);
+            }else {
+                throw new DbException("Unexpected error! No rows affected!");
+            }
+
+        }catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(ps);
+        }
     }
 
     @Override
@@ -85,7 +119,37 @@ public class SellerDaoJDBC implements SellerDAO {
     }
     @Override
     public List<Seller> findAll() {
-        return List.of();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try{
+            ps = conn.prepareStatement(
+                    "SELECT seller.*, department.Name as DepName "
+                            +"FROM seller INNER JOIN department "
+                            +"ON seller.DepartmentId = department.Id "
+                            +"ORDER BY Name");
+
+            rs = ps.executeQuery();
+
+            List<Seller> list = new ArrayList<>();
+            Map<Integer, Department> map = new HashMap<>();
+
+            while(rs.next()){
+                Department dep = map.get(rs.getInt("DepartmentId"));
+                if(dep == null){
+                    dep = instantiateDepartment(rs);
+                    map.put(rs.getInt("DepartmentId"),dep);
+                }
+                Seller sll = instantiateSeller(rs, dep);
+                list.add(sll);
+            }
+            return list;
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            DB.closeStatement(ps);
+            DB.closeResultSet(rs);
+        }
+
     }
 
     @Override

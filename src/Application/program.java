@@ -19,12 +19,27 @@ public class program {
         Seller seller = sellerDAO.findById(3);
         System.out.println(seller);
 
-        System.out.println("\n=== TEST 1: seller findByDepartment ===");
+
+        System.out.println("\n=== TEST 2: seller findByDepartment ===");
         Department dep = new Department(4,null);
         List<Seller> list = sellerDAO.findByDepartment(dep);
 
         for (Seller sl : list) {
             System.out.println(sl);
         }
+
+
+        System.out.println("\n=== TEST 3: seller findAll ===");
+        List<Seller> dp = sellerDAO.findAll();
+
+        for (Seller sl : dp) {
+            System.out.println(sl);
+        }
+
+
+        System.out.println("\n=== TEST 3: seller insert ===");
+        Seller sll = new Seller(null,"Greg","greg@gmail.com", new Date(2004,10,12),4000.0,dep);
+        sellerDAO.insert(sll);
+        System.out.println(sll.getId());
     }
 }
